@@ -478,11 +478,11 @@ export function IntroScreen() {
                     <motion.div
                         className="relative z-10 flex flex-col items-center justify-center min-h-screen w-full px-6 py-12"
                     >
-                        <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-6xl mx-auto gap-12 md:gap-8">
+                        <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl mx-auto gap-12 md:gap-16">
 
                             {/* LEFT PANEL */}
                             <motion.div
-                                className="flex-1 flex flex-col justify-center items-center md:items-start text-center md:text-left"
+                                className="flex-1 flex flex-col justify-center items-center md:items-start text-center md:text-left md:pl-8 lg:pl-12"
                                 initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 1, ease: 'easeOut' }}
                             >
@@ -490,12 +490,13 @@ export function IntroScreen() {
                                     text="Hiba's Journey"
                                     initialDelay={400}
                                     style={{
-                                        fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
+                                        fontSize: 'clamp(1.8rem, 5.5vw, 3.2rem)',
                                         fontWeight: 900,
                                         fontFamily: 'Outfit, sans-serif',
                                         letterSpacing: '-0.03em',
                                         marginBottom: '1rem',
                                         color: '#000000',
+                                        flexWrap: 'nowrap',
                                     }}
                                 />
 
@@ -531,12 +532,17 @@ export function IntroScreen() {
                             >
                                 <div className="relative mb-10">
                                     <motion.div
-                                        className="relative z-10 w-48 h-48 md:w-64 md:h-64 rounded-[2.5rem] overflow-hidden border-4 border-white/20 shadow-2xl"
+                                        className="relative z-10 w-48 h-64 md:w-56 md:h-72 lg:w-65 lg:h-80 rounded-[2rem] overflow-hidden border-4 border-white/30 shadow-2xl bg-black/10"
+                                        style={{ willChange: 'transform' }}
                                         whileHover={{ scale: 1.05, rotate: 2 }}
                                         transition={{ type: "spring", stiffness: 300, damping: 15 }}
                                     >
-                                        <img src={photo} alt="Profile" className="w-full h-full object-cover" />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+                                        <img
+                                            src={photo}
+                                            alt="Profile"
+                                            className="w-full h-full object-cover object-[center_15%] select-none"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
                                     </motion.div>
                                     <div className="absolute -inset-10 bg-white/10 blur-3xl rounded-full scale-75 opacity-30 -z-10" />
                                 </div>

@@ -87,7 +87,7 @@ export function HUD() {
     const visitedStations = useGameStore((s) => s.visitedStations);
     const moving = useGameStore((s) => s.moving);
 
-    const visible = ['game', 'arrived', 'reading', 'finishing'].includes(phase);
+    const visible = ['game', 'arrived', 'finishing'].includes(phase);
     if (!visible) return null;
 
     const nextUnvisited = STATIONS.findIndex((_, i) => !visitedStations.has(i));

@@ -35,7 +35,7 @@ function TechCloud({ technologies }) {
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
     const mousePos = useRef({ x: -100, y: -100 });
 
-    const R = 26; // collision radius (half of bubble size 52px)
+    const R = 30; // collision radius
     const DIAM = R * 2;
     const FRICTION = 0.994; // Lower friction for more persistent movement
     const BOUNCE = 0.85; // Higher bounce for more energy retention
@@ -48,8 +48,8 @@ function TechCloud({ technologies }) {
         return {
             tech,
             id: i,
-            x: col * 62 + 45 + (Math.random() - 0.5) * 15,
-            y: row * 62 + 45 + (Math.random() - 0.5) * 15,
+            x: col * 75 + 45 + (Math.random() - 0.5) * 15,
+            y: row * 75 + 45 + (Math.random() - 0.5) * 15,
             vx: (Math.random() - 0.5) * 1.2,
             vy: (Math.random() - 0.5) * 1.2,
             mvX: motionValue(0),
@@ -166,7 +166,7 @@ function TechCloud({ technologies }) {
             {bubbles.map((b) => (
                 <div
                     key={b.id}
-                    style={{ width: 52, height: 52, position: 'absolute', left: 0, top: 0 }}
+                    style={{ width: 60, height: 60, position: 'absolute', left: 0, top: 0 }}
                 >
                     <MagneticTechBubble tech={b.tech} i={b.id} x={b.mvX} y={b.mvY} />
                 </div>
@@ -181,34 +181,34 @@ function MagneticTechBubble({ tech, i, x, y }) {
 
     return (
         <motion.div
-            style={{ x, y }}
-            className="group absolute w-10 h-10 md:w-[52px] md:h-[52px]"
+            style={{
+                x, y,
+                width: 60,
+                height: 60,
+                borderRadius: '50%',
+                position: 'absolute'
+            }}
+            className="group"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
             <motion.div
                 initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: isHovered ? 1.35 : 1 }}
+                animate={{ opacity: 1, scale: isHovered ? 1.2 : 1 }}
                 transition={{ type: 'spring', damping: 14, stiffness: 160, delay: i * 0.008 }}
             >
                 <motion.div
-                    className="w-full h-full rounded-full relative flex items-center justify-center"
-                    animate={isHovered ? {
-                        boxShadow: ['0 0 0px rgba(255,255,255,0)', '0 0 22px rgba(255,255,255,0.45)', '0 0 12px rgba(255,255,255,0.2)']
-                    } : {}}
+                    className="w-14 h-14 rounded-full relative flex items-center justify-center"
                 >
                     <motion.div
                         className="absolute inset-0 rounded-full"
-                        animate={{ rotate: isHovered ? 720 : 360 }}
-                        transition={{ rotate: { duration: isHovered ? 3 : 10, repeat: Infinity, ease: "linear" } }}
                     >
                         <div className="absolute inset-0 rounded-full bg-white/20 backdrop-blur-md border border-white/40 shadow-[inset_0_4px_12px_rgba(255,255,255,0.6),0_8px_20px_rgba(0,0,0,0.08)]" />
-                        <div className="absolute top-1 left-2.5 w-3.5 h-2 bg-white/50 rounded-[50%] rotate-[-25deg] blur-[1px]" />
-                        <div className="absolute inset-1.5 rounded-full border border-white/5 border-dashed" />
+                        <div className="absolute top-[10%] left-[10%] w-[35%] h-[20%] bg-white/40 rounded-[50%] rotate-[-25deg] blur-[1px]" />
+                        <div className="absolute inset-2 rounded-full border border-white/5 border-dashed" />
                     </motion.div>
-                    <div className={`absolute inset-0 rounded-full transition-opacity duration-300 bg-gradient-to-tr from-white/0 to-white/40 z-0 ${isHovered ? 'opacity-100' : 'opacity-0'}`} />
                     <motion.div
-                        className="w-8 h-8 flex items-center justify-center z-10"
+                        className="w-9 h-9 flex items-center justify-center z-10"
                         animate={{
                             y: isHovered ? [0, -2, 2, 0] : [0, -1.5, 0],
                             rotate: isHovered ? [0, 15, -15, 0] : [0, 3, -3, 0]
@@ -328,9 +328,6 @@ function CertificateFolders() {
                                 />
                             ))}
                         />
-                        <span className="text-[10px] font-black text-[#3d2a1d60] uppercase tracking-widest text-center max-w-[100px]">
-                            {group.name}
-                        </span>
                     </div>
                 ))}
             </div>

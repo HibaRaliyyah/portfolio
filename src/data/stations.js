@@ -24,7 +24,7 @@ import lovableIcon from '../assets/lovable.jpeg';
 import antigravityIcon from '../assets/antigravity.png';
 import chatgptIcon from '../assets/chatgpt.png';
 import prebuiltuiIcon from '../assets/prebuiltui.jpeg';
-import materializeCssIcon from '../assets/Materializecss.png';
+import materializeCssIcon from '../assets/materializecss.png';
 
 // Project Images
 import genart from '../assets/genart.png';

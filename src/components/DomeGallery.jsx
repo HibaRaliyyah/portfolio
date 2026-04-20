@@ -282,7 +282,8 @@ export default function DomeGallery({
                 const dyTotal = evt.clientY - startPosRef.current.y;
                 if (!movedRef.current) {
                     const dist2 = dxTotal * dxTotal + dyTotal * dyTotal;
-                    if (dist2 > 16) movedRef.current = true;
+                    const threshold = ('ontouchstart' in window) ? 100 : 25; // 10px for touch, 5px for mouse
+                    if (dist2 > threshold) movedRef.current = true;
                 }
                 const nextX = clamp(
                     startRotRef.current.x - dyTotal / dragSensitivity,
@@ -531,6 +532,7 @@ export default function DomeGallery({
 
     const onTileClick = useCallback(
         e => {
+            e.stopPropagation();
             if (draggingRef.current) return;
             if (movedRef.current) return;
             if (performance.now() - lastDragEndAt.current < 80) return;
@@ -552,6 +554,7 @@ export default function DomeGallery({
     const onTilePointerUp = useCallback(
         e => {
             if (e.pointerType !== 'touch') return;
+            e.stopPropagation();
             if (draggingRef.current) return;
             if (movedRef.current) return;
             if (performance.now() - lastDragEndAt.current < 80) return;

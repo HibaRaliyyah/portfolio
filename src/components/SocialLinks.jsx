@@ -4,6 +4,7 @@ import { useGameStore } from '../store/gameStore';
 import githubIcon from '../assets/github.png';
 import linkedinIcon from '../assets/linkedin.png';
 import hibiIcon from '../assets/hibi.png';
+import discordIcon from '../assets/discord.png';
 
 const MagneticBall = ({ social, index }) => {
     const ref = useRef(null);
@@ -130,7 +131,7 @@ const MagneticBall = ({ social, index }) => {
                         className="w-9 h-9 object-contain relative z-10"
                         animate={isHovered ? {
                             rotate: [0, -15, 15, 0],
-                            scale: [1, 1.1, 1]
+                            scale: [(social.iconScale || 1), (social.iconScale || 1) * 1.1, (social.iconScale || 1)]
                         } : {}}
                         transition={{ duration: 0.6, repeat: isHovered ? Infinity : 0 }}
                     />
@@ -153,9 +154,14 @@ export function SocialLinks() {
         { id: 'github', icon: githubIcon, url: 'https://github.com/HibaRaliyyah/', label: 'View my code' },
         { id: 'linkedin', icon: linkedinIcon, url: 'https://www.linkedin.com/in/hiba-raliyyah-samsudeen-10032006hr/', label: 'Connect with me' },
         { id: 'hibi', icon: hibiIcon, url: 'https://hibi-personalassistant.vercel.app/', label: 'Chat with Hibi!' },
+        { id: 'discord', icon: discordIcon, url: 'https://discord.com/channels/1495727150131707924/1495727151817953363', label: 'Connect with Discord', iconScale: 1.15 },
     ];
 
-    if (phase === 'intro') return null;
+    // Rules:
+    // 1. Visible when not in intro, reading (NewspaperModal), or arrived (ArrivePrompt) phases
+    const isHidden = ['intro', 'reading', 'arrived', 'final'].includes(phase);
+
+    if (isHidden) return null;
 
     return (
         <div className="fixed bottom-6 right-6 z-[70] flex flex-col gap-4">

@@ -428,7 +428,7 @@ export function IntroScreen() {
             {phase === 'intro' && (
                 <motion.div
                     className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
-                    style={{ background: 'linear-gradient(135deg, #eedf0fff 5%, #53ce1aff 33%, #53ce1aff 66%, #eedf0fff 100%)' }}
+                    style={{ background: 'linear-gradient(135deg, #98ee0fff 5%, #31830bff 33%, #53ce1aff 66%, #61ee0fff 100%)' }}
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0, scale: 1.05 }}
                     transition={{ duration: 0.7, ease: 'easeInOut' }}
@@ -476,9 +476,9 @@ export function IntroScreen() {
 
                     {/* Main Responsive Container */}
                     <motion.div
-                        className="relative z-10 flex flex-col items-center justify-center min-h-screen w-full px-6 py-12"
+                        className="relative z-10 flex flex-col items-center justify-start md:justify-center min-h-screen w-full px-6 pt-8 md:pt-12 pb-12"
                     >
-                        <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl mx-auto gap-12 md:gap-16">
+                        <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl mx-auto gap-2 md:gap-16">
 
                             {/* LEFT PANEL */}
                             <motion.div
@@ -501,13 +501,13 @@ export function IntroScreen() {
                                 />
 
                                 <p
-                                    className="mb-8 text-sm md:text-base lg:text-lg opacity-90 leading-relaxed max-w-xl text-black"
+                                    className="mb-8 text-sm md:text-base lg:text-lg opacity-90 leading-relaxed max-w-xl text-white"
                                     style={{ fontFamily: 'Outfit, sans-serif' }}
                                 >
                                     {bio}
                                 </p>
 
-                                <motion.div className="flex gap-4 flex-wrap items-center justify-center md:justify-start"
+                                <motion.div className="hidden md:flex gap-4 flex-wrap items-center justify-center md:justify-start"
                                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 1.2, duration: 0.6 }}
                                 >
@@ -548,7 +548,7 @@ export function IntroScreen() {
                                 </div>
 
                                 <motion.div
-                                    className="flex flex-col items-center"
+                                    className="flex flex-col items-center mb-10 w-full"
                                     initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.8, duration: 0.7 }}
                                 >
@@ -556,12 +556,29 @@ export function IntroScreen() {
                                         text="S.Hiba Raliyyah"
                                         colors={['ffffff', 'ffffff', 'ffffff', 'ffffff']}
                                         animationForce={60}
-                                        width={400}
-                                        height={60}
+                                        width={typeof window !== 'undefined' && window.innerWidth < 768 ? 300 : 400}
+                                        height={typeof window !== 'undefined' && window.innerWidth < 768 ? 50 : 60}
                                     />
                                     <p className="mt-2 text-xs font-black uppercase tracking-[0.4em]" style={{ color: '#000000', fontFamily: 'Outfit, sans-serif', opacity: 0.9 }}>
                                         Full Stack Developer
                                     </p>
+                                </motion.div>
+
+                                {/* Mobile Buttons - Visible only on mobile, placed below name/title */}
+                                <motion.div className="flex md:hidden gap-4 flex-wrap items-center justify-center"
+                                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 1.2, duration: 0.6 }}
+                                >
+                                    <GlassButton size="default" className="btn-secondary"
+                                        onClick={() => window.location.href = 'https://hibi-personalassistant.vercel.app/'}
+                                    >
+                                        <img src={hibiIcon} alt="Hibi" className="w-8 h-8 object-contain" />
+                                    </GlassButton>
+                                    <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}>
+                                        <GlassButton size="default" onClick={startGame} className="btn-primary">
+                                            START JOURNEY ➔
+                                        </GlassButton>
+                                    </motion.div>
                                 </motion.div>
                             </motion.div>
                         </div>

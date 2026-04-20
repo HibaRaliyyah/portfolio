@@ -158,8 +158,8 @@ function TechCloud({ technologies }) {
     return (
         <div
             ref={containerRef}
-            className="relative w-full overflow-hidden rounded-[40px] border border-white/10 bg-gradient-to-br from-[#1a1a1a] via-[#0a0a0a] to-black shadow-[inset_0_8px_32px_rgba(0,0,0,0.5),0_20px_40px_rgba(0,0,0,0.2)]"
-            style={{ minHeight: '260px', height: '35vh', maxHeight: '420px', marginTop: 20 }}
+            className="relative w-full overflow-hidden rounded-[30px] md:rounded-[40px] border border-white/10 bg-gradient-to-br from-[#1a1a1a] via-[#0a0a0a] to-black shadow-[inset_0_8px_32px_rgba(0,0,0,0.5),0_20px_40px_rgba(0,0,0,0.2)]"
+            style={{ minHeight: '320px', height: '40vh', maxHeight: '450px', marginTop: 20 }}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
         >
@@ -342,7 +342,7 @@ export function NewspaperModal() {
     const closeSection = useGameStore((s) => s.closeSection);
     const scrollRef = useRef(null);
     const skillsRef = useRef(null);
-    const [selectedProject, setSelectedProject] = useState(null);
+    const setSelectedProject = useGameStore((s) => s.setSelectedProject);
 
     const isOpen = phase === 'reading';
     const station = STATIONS[currentStation];
@@ -629,10 +629,6 @@ export function NewspaperModal() {
                     </motion.div>
                 )}
             </AnimatePresence>
-            <ProjectDetailPanel
-                project={selectedProject}
-                onClose={() => setSelectedProject(null)}
-            />
         </>
     );
 }

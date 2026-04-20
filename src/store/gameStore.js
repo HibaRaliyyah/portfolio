@@ -7,10 +7,14 @@ export const useGameStore = create((set, get) => ({
     moving: false,
     bicycleProgress: 0.02,
     targetStation: -1,
+    selectedProject: null, // Track globally for clean UI overlays
 
     startGame: () => set({ phase: 'game' }),
     setMoving: (v) => set({ moving: v }),
     setBikeProgress: (p) => set({ bicycleProgress: p }),
+
+    setSelectedProject: (proj) => set({ selectedProject: proj }),
+    clearSelectedProject: () => set({ selectedProject: null }),
 
     arriveAtStation: (idx) =>
         set((s) => ({
@@ -28,6 +32,7 @@ export const useGameStore = create((set, get) => ({
         set((s) => ({
             phase: s.visitedStations.size >= 5 ? 'finishing' : 'game',
             moving: s.visitedStations.size >= 5 ? true : false,
+            selectedProject: null, // Close panel when modal closes
         })),
 
     skipStation: () => set({ phase: 'game', moving: false }),
@@ -58,6 +63,7 @@ export const useGameStore = create((set, get) => ({
             moving: false,
             bicycleProgress: 0.02,
             targetStation: -1,
+            selectedProject: null,
         }),
 
     playAgain: () =>
@@ -68,5 +74,6 @@ export const useGameStore = create((set, get) => ({
             moving: false,
             bicycleProgress: 0.02,
             targetStation: -1,
+            selectedProject: null,
         }),
 }));

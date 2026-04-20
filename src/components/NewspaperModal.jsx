@@ -159,7 +159,7 @@ function TechCloud({ technologies }) {
         <div
             ref={containerRef}
             className="relative w-full overflow-hidden rounded-[30px] md:rounded-[40px] border border-white/10 bg-gradient-to-br from-[#1a1a1a] via-[#0a0a0a] to-black shadow-[inset_0_8px_32px_rgba(0,0,0,0.5),0_20px_40px_rgba(0,0,0,0.2)]"
-            style={{ minHeight: '320px', height: '40vh', maxHeight: '450px', marginTop: 20 }}
+            style={{ minHeight: '380px', height: '50vh', maxHeight: '550px', marginTop: 20 }}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
         >
@@ -504,7 +504,8 @@ export function NewspaperModal() {
                                                                 "Java",
                                                                 "25+ problems in DSA",
                                                                 "Python",
-                                                                "Vibe coding"
+                                                                "Vibe coding",
+                                                                "Prompt Engineering"
                                                             ].map((skill, i) => (
                                                                 <motion.div
                                                                     key={i}
@@ -539,7 +540,7 @@ export function NewspaperModal() {
                                                             ))}
                                                         </div>
                                                     )}
-                                                    <div className="relative w-full h-[400px] mt-8 rounded-[40px] overflow-hidden border-[5px] border-[#3d2a1d20] shadow-inner bg-[#3d2a1d05]">
+                                                    <div className="relative w-full h-[500px] mt-8 rounded-[40px] overflow-hidden border-[5px] border-[#3d2a1d20] shadow-inner bg-[#3d2a1d05]">
                                                         <DomeGallery
                                                             images={(station.projects || []).map(p => ({ src: p.src, alt: p.alt }))}
                                                             fit={1}

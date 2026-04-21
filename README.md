@@ -4,7 +4,7 @@
 
 Welcome to my professional portfolio! I am Hiba Raliyyah, a passionate individual dedicated to continuous learning and growth. This portfolio showcases my journey, skills, and projects that reflect my commitment to excellence in my field.
 
-![Hiba's Journey]<img width="1358" height="610" alt="portfolio" src="https://github.com/user-attachments/assets/42db6731-cfda-490a-b51a-e81f47227334" />
+<img width="1358" height="610" alt="portfolio" src="https://github.com/user-attachments/assets/42db6731-cfda-490a-b51a-e81f47227334" />
 
 ## About Me
 

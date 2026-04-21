@@ -1,11 +1,10 @@
-<img width="1358" height="610" alt="portfolio" src="https://github.com/user-attachments/assets/42db6731-cfda-490a-b51a-e81f47227334" /># Hiba Raliyyah's Portfolio
+# Hiba Raliyyah's Portfolio
 
 ## Introduction
 
 Welcome to my professional portfolio! I am Hiba Raliyyah, a passionate individual dedicated to continuous learning and growth. This portfolio showcases my journey, skills, and projects that reflect my commitment to excellence in my field.
 
-![Hiba's Journey](<img width="1358" height="610" alt="portfolio" src="https://github.com/user-attachments/assets/f341c7a4-1701-41d8-b8e5-50347eb05da3" />
-)
+![Hiba's Journey](<img width="1358" height="610" alt="portfolio" src="https://github.com/user-attachments/assets/42db6731-cfda-490a-b51a-e81f47227334" />)
 
 ## About Me
 

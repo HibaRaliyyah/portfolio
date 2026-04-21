@@ -35,11 +35,11 @@ function TechCloud({ technologies }) {
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
     const mousePos = useRef({ x: -100, y: -100 });
 
-    const R = 30; // collision radius
+    const R = 28; // slightly smaller collision radius for more space
     const DIAM = R * 2;
-    const FRICTION = 0.994; // Lower friction for more persistent movement
-    const BOUNCE = 0.85; // Higher bounce for more energy retention
-    const MOUSE_PUSH = 150;
+    const FRICTION = 0.996; // Less friction for more active movement
+    const BOUNCE = 0.92; // Higher bounce for better energy
+    const MOUSE_PUSH = 160;
 
     const bubbles = useMemo(() => technologies.map((tech, i) => {
         const cols = 12;
@@ -63,14 +63,23 @@ function TechCloud({ technologies }) {
     useEffect(() => {
         const resize = () => {
             if (!containerRef.current) return;
-            const rect = containerRef.current.getBoundingClientRect();
-            setContainerSize({ width: rect.width || 750, height: rect.height || 420 });
+            const w = containerRef.current.offsetWidth;
+            const h = containerRef.current.offsetHeight;
+            if (w > 0 && h > 0) {
+                setContainerSize({ width: w, height: h });
+            }
         };
+
+        const observer = new ResizeObserver(resize);
+        if (containerRef.current) observer.observe(containerRef.current);
+
         resize();
-        window.addEventListener('resize', resize);
-        const timer = setTimeout(resize, 200);
-        return () => { window.removeEventListener('resize', resize); clearTimeout(timer); };
-    }, []);
+        const timer = setTimeout(resize, 500);
+        return () => {
+            observer.disconnect();
+            clearTimeout(timer);
+        };
+    }, [technologies]);
 
     useEffect(() => {
         let raf;
@@ -84,8 +93,8 @@ function TechCloud({ technologies }) {
                 b.wave += 0.008 * b.waveSpeed;
                 b.angle += 0.007;
 
-                b.vx += Math.cos(b.angle) * 0.045 + Math.cos(b.wave) * 0.02;
-                b.vy += Math.sin(b.angle) * 0.045 + Math.sin(b.wave * 1.3) * 0.02;
+                b.vx += Math.cos(b.angle) * 0.055 + Math.cos(b.wave) * 0.03;
+                b.vy += Math.sin(b.angle) * 0.055 + Math.sin(b.wave * 1.3) * 0.03;
 
                 const mx = mousePos.current.x;
                 const my = mousePos.current.y;
@@ -107,13 +116,9 @@ function TechCloud({ technologies }) {
 
                 const speed = Math.hypot(b.vx, b.vy);
                 if (speed > 6) { b.vx *= 6 / speed; b.vy *= 6 / speed; }
-
-                if (b.x < R) { b.x = R; b.vx = Math.abs(b.vx) * BOUNCE; }
-                if (b.x > W - R) { b.x = W - R; b.vx = -Math.abs(b.vx) * BOUNCE; }
-                if (b.y < R) { b.y = R; b.vy = Math.abs(b.vy) * BOUNCE; }
-                if (b.y > H - R) { b.y = H - R; b.vy = -Math.abs(b.vy) * BOUNCE; }
             }
 
+            // Collision resolution between bubbles
             for (let i = 0; i < bubbles.length; i++) {
                 for (let j = i + 1; j < bubbles.length; j++) {
                     const a = bubbles[i], b2 = bubbles[j];
@@ -134,6 +139,16 @@ function TechCloud({ technologies }) {
                         }
                     }
                 }
+            }
+
+            // Final boundary containment (force them to stay inside visible bounds)
+            const padding = 12; // More padding to ensure visibility
+            for (let i = 0; i < bubbles.length; i++) {
+                const b = bubbles[i];
+                if (b.x < R + padding) { b.x = R + padding; b.vx = Math.abs(b.vx) * BOUNCE; }
+                if (b.x > W - R - padding) { b.x = W - R - padding; b.vx = -Math.abs(b.vx) * BOUNCE; }
+                if (b.y < R + padding) { b.y = R + padding; b.vy = Math.abs(b.vy) * BOUNCE; }
+                if (b.y > H - R - padding) { b.y = H - R - padding; b.vy = -Math.abs(b.vy) * BOUNCE; }
             }
 
             bubbles.forEach(b => {
@@ -158,8 +173,8 @@ function TechCloud({ technologies }) {
     return (
         <div
             ref={containerRef}
-            className="relative w-full overflow-hidden rounded-[30px] md:rounded-[40px] border border-white/10 bg-gradient-to-br from-[#1a1a1a] via-[#0a0a0a] to-black shadow-[inset_0_8px_32px_rgba(0,0,0,0.5),0_20px_40px_rgba(0,0,0,0.2)]"
-            style={{ minHeight: '380px', height: '50vh', maxHeight: '550px', marginTop: 20 }}
+            className="relative w-full overflow-hidden rounded-[30px] md:rounded-[40px] border border-white/10 bg-gradient-to-br from-[#1a1a1a] via-[#0a0a0a] to-black shadow-[inset_0_8px_32px_rgba(0,0,0,0.5),0_20px_40px_rgba(0,0,0,0.2)] h-[440px] md:h-[360px]"
+            style={{ marginTop: 20 }}
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
         >
@@ -390,7 +405,7 @@ export function NewspaperModal() {
 
                             <motion.div
                                 className="relative w-full overflow-hidden bg-[#f8f4ed] border-[3px] md:border-[5px] border-[#3d2a1d] shadow-[10px_10px_0px_rgba(61,42,29,0.1)] md:shadow-[15px_15px_0px_rgba(61,42,29,0.1)]"
-                                style={{ borderRadius: '30px md:40px', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}
+                                style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}
                                 initial={{ scale: 0.9, y: 30, opacity: 0 }}
                                 animate={{ scale: 1, y: 0, opacity: 1 }}
                                 exit={{ scale: 0.9, y: 30, opacity: 0 }}

@@ -25,6 +25,10 @@ import antigravityIcon from '../assets/antigravity.png';
 import chatgptIcon from '../assets/chatgpt.png';
 import prebuiltuiIcon from '../assets/prebuiltui.jpeg';
 import materializeCssIcon from '../assets/materializecss.png';
+import openrouterIcon from '../assets/openrouter.png';
+import huggingfaceIcon from '../assets/huggingface.png';
+import figmaIcon from '../assets/figma.png';
+import canvaIcon from '../assets/canva.png';
 
 // Project Images
 import genart from '../assets/genart.png';
@@ -109,6 +113,10 @@ export const STATIONS = [
             { name: 'Bootstrap', icon: 'https://skillicons.dev/icons?i=bootstrap' },
             { name: 'Postman', icon: 'https://skillicons.dev/icons?i=postman' },
             { name: 'Materialize CSS', icon: materializeCssIcon },
+            { name: 'OpenRouter', icon: openrouterIcon },
+            { name: 'HuggingFace', icon: huggingfaceIcon },
+            { name: 'Figma', icon: figmaIcon },
+            { name: 'Canva', icon: canvaIcon },
         ],
     },
     {

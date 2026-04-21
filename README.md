@@ -20,5 +20,5 @@ I invite you to explore my work and feel free to connect with me for any collabo
 Thank you for visiting my portfolio!  
 
 ### Contact  
-- Email: hibaraliyyah12@example.com  
+- Email: hibaraliyyah12@gmail.com  
 - LinkedIn: [Hiba Raliyyah](https://www.linkedin.com/in/hiba-raliyyah-samsudeen-10032006hr/)

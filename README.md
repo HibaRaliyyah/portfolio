@@ -6,7 +6,7 @@ Welcome to my professional portfolio! I am Hiba Raliyyah, a passionate individua
 
 <img width="1358" height="610" alt="portfolio" src="https://github.com/user-attachments/assets/42db6731-cfda-490a-b51a-e81f47227334" />
 
-## Link: 
+## Link
 
 https://hibaraliyyah-portfolio.vercel.app/
 ## About Me

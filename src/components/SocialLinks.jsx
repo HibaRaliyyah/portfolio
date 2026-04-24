@@ -147,7 +147,7 @@ const MagneticBall = ({ social, index }) => {
     );
 };
 
-export function SocialLinks() {
+export function SocialLinks({ isFloating = true, className = "" }) {
     const phase = useGameStore((state) => state.phase);
 
     const socials = [
@@ -157,14 +157,18 @@ export function SocialLinks() {
         { id: 'discord', icon: discordIcon, url: 'https://discord.com/channels/1495727150131707924/1495727151817953363', label: 'Connect with Discord', iconScale: 1.15 },
     ];
 
-    // Rules:
-    // 1. Visible when not in intro, reading (NewspaperModal), or arrived (ArrivePrompt) phases
-    const isHidden = ['intro', 'reading', 'arrived', 'final'].includes(phase);
+    // Rules for floating version:
+    // Hidden during intro, reading, arrived, final
+    if (isFloating && ['intro', 'reading', 'arrived', 'final'].includes(phase)) {
+        return null;
+    }
 
-    if (isHidden) return null;
+    const containerStyle = isFloating
+        ? "fixed bottom-6 right-6 z-[70] flex flex-col gap-4"
+        : `flex gap-4 ${className}`;
 
     return (
-        <div className="fixed bottom-6 right-6 z-[70] flex flex-col gap-4">
+        <div className={containerStyle}>
             {socials.map((social, i) => (
                 <MagneticBall key={social.id} social={social} index={i} />
             ))}

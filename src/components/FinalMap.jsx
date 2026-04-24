@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
 import { STATIONS } from '../data/stations';
+import { SocialLinks } from './SocialLinks';
 
 /* ── Magnetic Map Icon Component ── */
 function MagneticMapIcon({ station, i, rideToStation }) {
@@ -103,20 +104,20 @@ export function FinalMap() {
         <AnimatePresence>
             {isEnd && (
                 <motion.div
-                    className="fixed inset-0 z-[60] flex items-end justify-center pb-4 md:pb-8"
+                    className="fixed inset-0 z-[60] flex items-end justify-center pb-4 md:pb-12"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     style={{ pointerEvents: 'none' }}
                 >
                     <motion.div
-                        className="pointer-events-auto w-full max-w-4xl mx-4"
+                        className="pointer-events-auto w-full max-w-5xl mx-4 flex flex-col md:flex-row items-center md:items-end justify-center gap-4 md:gap-8"
                         initial={{ y: 150, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         exit={{ y: 150, opacity: 0 }}
                         transition={{ type: 'spring', stiffness: 200, damping: 22, delay: 0.1 }}
                     >
-                        <div className="rounded-[24px] md:rounded-[32px] border-[2px] md:border-[3px]" style={{
+                        <div className="flex-1 w-full rounded-[24px] md:rounded-[32px] border-[2px] md:border-[3px]" style={{
                             background: 'rgba(10,14,26,0.96)',
                             borderColor: 'rgba(126,207,179,0.4)',
                             backdropFilter: 'blur(24px)',
@@ -124,6 +125,11 @@ export function FinalMap() {
                             overflow: 'hidden',
                             boxShadow: '0 -15px 70px rgba(126,207,179,0.2), 0 40px 100px rgba(0,0,0,0.8)',
                         }}>
+                            {/* Mobile Social Links - Top of card */}
+                            <div className="md:hidden pt-6 pb-2 flex justify-center border-b border-white/5">
+                                <SocialLinks isFloating={false} className="flex-row scale-90" />
+                            </div>
+
                             <div className="px-4 md:px-6 py-4 md:py-5 text-center" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                                 <div className="font-black text-xl md:text-2xl uppercase tracking-tighter" style={{
                                     background: 'linear-gradient(135deg, #7ecfb3 0%, #a78bfa 50%, #ff7744 100%)',
@@ -169,6 +175,11 @@ export function FinalMap() {
                                     Restart Journey
                                 </motion.button>
                             </div>
+                        </div>
+
+                        {/* Desktop Social Links - Right Side */}
+                        <div className="hidden md:block pb-6">
+                            <SocialLinks isFloating={false} className="flex-col" />
                         </div>
                     </motion.div>
                 </motion.div>

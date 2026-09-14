@@ -51,7 +51,7 @@ export const STATIONS = [
         roofColor: '#1e1b4b',      // dark navy — flat roof
         opacity: 1,
         headline: "Hello, I'm Hiba!",
-        text: "I'm an aspiring Full Stack Developer and a pre-final year student passionate about building meaningful digital experiences. My journey began with curiosity about how websites and apps work, which grew into a strong interest in both frontend and backend development. I enjoy turning ideas into real applications and continuously improving my problem-solving skills. I'm eager to learn, build, and grow as a versatile developer, creating impactful and user-friendly solutions.",
+        text: "I'm an aspiring Full Stack Developer and a final year student passionate about building meaningful digital experiences. My journey began with curiosity about how websites and apps work, which grew into a strong interest in both frontend and backend development. I enjoy turning ideas into real applications and continuously improving my problem-solving skills. I'm eager to learn, build, and grow as a versatile developer, creating impactful and user-friendly solutions.",
         subheading: 'Education',
         tags: ['Creative Thinker', 'Problem Solver', 'Team Player', 'Lifelong Learner'],
         education: [

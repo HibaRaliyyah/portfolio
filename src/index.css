@@ -16,6 +16,10 @@
   --color-mint: #7ecfb3;
   --color-cream: #f5f0e8;
   --color-accent: #ff7744;
+  --font-island-moments: 'Island Moments', cursive;
+  --font-luxurious-roman: 'Luxurious Roman', serif;
+  --font-poppins: 'Poppins', sans-serif;
+  --font-press-start-2p: 'Press Start 2P', cursive;
 }
 
 html,

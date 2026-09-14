@@ -10,6 +10,10 @@ export default {
         sans: ['Outfit', 'sans-serif'],
         serif: ['Playfair Display', 'serif'],
         mono: ['JetBrains Mono', 'monospace'],
+        islandMoments: ["'Island Moments'", 'cursive'],
+        luxuriousRoman: ["'Luxurious Roman'", 'serif'],
+        poppins: ["'Poppins'", 'sans-serif'],
+        pressStart2P: ["'Press Start 2P'", 'cursive'],
       },
       colors: {
         mint: '#7ecfb3',

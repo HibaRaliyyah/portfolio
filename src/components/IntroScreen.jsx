@@ -1,601 +1,235 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
-import photo from '../assets/photo.jpeg';
-import aboutMe from '../assets/about_me.png';
-import { STATIONS } from '../data/stations';
+import portfolioHero from '../assets/background.png';
 import hibiIcon from '../assets/hibi.png';
-import Particles from './Particles';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 1. MatrixText
-// ─────────────────────────────────────────────────────────────────────────────
-function MatrixText({ text = 'Hello', style = {}, initialDelay = 200, letterAnimationDuration = 500, letterInterval = 80 }) {
-    const [letters, setLetters] = useState(() =>
-        text.split('').map((char) => ({ char, isMatrix: false, isSpace: char === ' ' }))
-    );
-    const [isAnimating, setIsAnimating] = useState(false);
-
-    const getRandomChar = useCallback(() => (Math.random() > 0.5 ? '1' : '0'), []);
-
-    const animateLetter = useCallback((index) => {
-        if (index >= text.length) return;
-        requestAnimationFrame(() => {
-            setLetters((prev) => {
-                const next = [...prev];
-                if (!next[index].isSpace) next[index] = { ...next[index], char: getRandomChar(), isMatrix: true };
-                return next;
-            });
-            setTimeout(() => {
-                setLetters((prev) => {
-                    const next = [...prev];
-                    next[index] = { ...next[index], char: text[index], isMatrix: false };
-                    return next;
-                });
-            }, letterAnimationDuration);
-        });
-    }, [getRandomChar, text, letterAnimationDuration]);
-
-    const startAnimation = useCallback(() => {
-        if (isAnimating) return;
-        setIsAnimating(true);
-        let i = 0;
-        const tick = () => {
-            if (i >= text.length) { setIsAnimating(false); return; }
-            animateLetter(i++);
-            setTimeout(tick, letterInterval);
-        };
-        tick();
-    }, [animateLetter, text, isAnimating, letterInterval]);
-
-    useEffect(() => {
-        let t1, t2;
-        const run = () => {
-            t1 = setTimeout(() => {
-                startAnimation();
-                t2 = setTimeout(run, text.length * letterInterval + letterAnimationDuration + 2500);
-            }, initialDelay);
-        };
-        run();
-        return () => { clearTimeout(t1); clearTimeout(t2); };
-    }, []);
-
-    return (
-        <div style={{ display: 'flex', flexWrap: 'wrap', ...style }}>
-            {letters.map((letter, i) => (
-                <span key={i} style={{
-                    fontFamily: 'inherit',
-                    display: 'inline-block',
-                    width: letter.isSpace ? '0.4em' : '1ch',
-                    textAlign: 'center',
-                    transition: 'color 0.1s, text-shadow 0.1s',
-                    color: letter.isMatrix ? '#ffffff' : 'inherit',
-                    textShadow: letter.isMatrix ? '0 0 10px rgba(255,255,255,0.9)' : 'none',
-                }}>
-                    {letter.isSpace ? '\u00A0' : letter.char}
-                </span>
-            ))}
-        </div>
-    );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 2. ParticleTextEffect
-// ─────────────────────────────────────────────────────────────────────────────
-function ParticleTextEffect({ text = 'HELLO', colors = ['ffffff', 'd0d0d0', 'a0a0a0', '808080'], animationForce = 55, particleDensity = 2, width = 260, height = 48 }) {
-    const canvasRef = useRef(null);
-    const ctxRef = useRef(null);
-    const animationIdRef = useRef(null);
-    const particlesRef = useRef([]);
-    const pointerRef = useRef({});
-    const hasPointerRef = useRef(false);
-    const interactionRadiusRef = useRef(70);
-
-    const rand = (max = 1, min = 0) => min + Math.random() * (max - min);
-
-    const dottify = useCallback(() => {
-        const ctx = ctxRef.current;
-        const canvas = canvasRef.current;
-        if (!ctx || !canvas) return;
-
-        const fSize = Math.floor(height * 0.75);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.font = `500 ${fSize}px Outfit, sans-serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        const tw = Math.round(ctx.measureText(text).width);
-        const tx = Math.floor((canvas.width - tw) / 2);
-        const ty = Math.floor((canvas.height - fSize) / 2);
-
-        const grad = ctx.createLinearGradient(tx, ty, tx + tw, ty + fSize);
-        const N = colors.length - 1;
-        colors.forEach((c, i) => grad.addColorStop(i / N, `#${c}`));
-        ctx.fillStyle = grad;
-        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-
-        interactionRadiusRef.current = Math.max(40, fSize * 1.1);
-
-        const safeW = Math.max(1, tw);
-        const safeH = Math.max(1, fSize);
-        const safeTx = Math.max(0, tx);
-        const safeTy = Math.max(0, ty);
-
-        let imgData;
-        try {
-            imgData = ctx.getImageData(safeTx, safeTy, safeW, safeH).data;
-        } catch { return; }
-
-        const pixels = [];
-        for (let i = 0; i < imgData.length; i += 4) {
-            if (!imgData[i + 3]) continue;
-            const px = (i / 4) % safeW;
-            const py = Math.floor((i / 4) / safeW);
-            if (px % particleDensity === 0 && py % particleDensity === 0) {
-                pixels.push({ x: safeTx + px, y: safeTy + py, rgb: [imgData[i], imgData[i + 1], imgData[i + 2]] });
-            }
-        }
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particlesRef.current = pixels.map(p => ({
-            ox: p.x, oy: p.y, cx: p.x, cy: p.y,
-            cr: rand(2.5, 0.8),
-            f: rand(animationForce + 12, animationForce - 12),
-            rgb: p.rgb.map(c => Math.max(0, c + rand(10, -10))),
-        }));
-        particlesRef.current.forEach(p => {
-            ctx.fillStyle = `rgb(${p.rgb.join(',')})`;
-            ctx.beginPath();
-            ctx.arc(p.cx, p.cy, p.cr, 0, 2 * Math.PI);
-            ctx.fill();
-        });
-    }, [text, colors, animationForce, particleDensity, height]);
-
-    const animate = useCallback(() => {
-        const ctx = ctxRef.current;
-        const canvas = canvasRef.current;
-        if (!ctx || !canvas) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particlesRef.current.forEach(p => {
-            if (hasPointerRef.current && pointerRef.current.x !== undefined) {
-                const dx = p.cx - pointerRef.current.x;
-                const dy = p.cy - pointerRef.current.y;
-                const dist = Math.hypot(dx, dy);
-                if (dist < interactionRadiusRef.current && dist > 0) {
-                    const force = Math.min(p.f, (interactionRadiusRef.current - dist) / dist * 2);
-                    p.cx += (dx / dist) * force;
-                    p.cy += (dy / dist) * force;
-                }
-            }
-            const odx = p.ox - p.cx;
-            const ody = p.oy - p.cy;
-            const od = Math.hypot(odx, ody);
-            if (od > 0.5) {
-                const restore = Math.min(od * 0.1, 3);
-                p.cx += (odx / od) * restore;
-                p.cy += (ody / od) * restore;
-            }
-            ctx.fillStyle = `rgb(${p.rgb.join(',')})`;
-            ctx.beginPath();
-            ctx.arc(p.cx, p.cy, p.cr, 0, 2 * Math.PI);
-            ctx.fill();
-        });
-        animationIdRef.current = requestAnimationFrame(animate);
-    }, []);
-
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        ctxRef.current = ctx;
-        canvas.width = width;
-        canvas.height = height;
-        dottify();
-        animationIdRef.current = requestAnimationFrame(animate);
-        return () => { if (animationIdRef.current) cancelAnimationFrame(animationIdRef.current); };
-    }, [text, width, height, dottify, animate]);
-
-    const handlePointerMove = (e) => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const rect = canvas.getBoundingClientRect();
-        pointerRef.current.x = (e.clientX - rect.left) * (canvas.width / rect.width);
-        pointerRef.current.y = (e.clientY - rect.top) * (canvas.height / rect.height);
-        hasPointerRef.current = true;
-    };
-
-    return (
-        <canvas
-            ref={canvasRef}
-            style={{ width, height, cursor: 'none', display: 'block' }}
-            onPointerMove={handlePointerMove}
-            onPointerLeave={() => { hasPointerRef.current = false; pointerRef.current = {}; }}
-            onPointerEnter={() => { hasPointerRef.current = true; }}
-        />
-    );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 3. BlurTextAnimation
-// ─────────────────────────────────────────────────────────────────────────────
-function BlurTextAnimation({ text = '', style = {}, className = '', animationDelay = 5000 }) {
-    const [isAnimating, setIsAnimating] = useState(false);
-    const animRef = useRef();
-    const resetRef = useRef();
-
-    const textWords = useMemo(() => text.split(' ').map((word, index, arr) => {
-        const progress = index / arr.length;
-        return {
-            text: word,
-            duration: 2.0 + Math.cos(index * 0.3) * 0.3,
-            delay: index * 0.055 + Math.pow(progress, 0.8) * 0.4 + (Math.random() - 0.5) * 0.04,
-            blur: 10 + Math.floor(Math.random() * 7),
-            scale: 0.9 + Math.sin(index * 0.2) * 0.05,
-        };
-    }), [text]);
-
-    useEffect(() => {
-        const startAnimation = () => {
-            setTimeout(() => setIsAnimating(true), 200);
-            const maxTime = textWords.reduce((m, w) => Math.max(m, w.delay + w.duration), 0);
-            animRef.current = setTimeout(() => {
-                setIsAnimating(false);
-                resetRef.current = setTimeout(startAnimation, animationDelay);
-            }, (maxTime + 1) * 1000);
-        };
-        startAnimation();
-        return () => { clearTimeout(animRef.current); clearTimeout(resetRef.current); };
-    }, [textWords, animationDelay]);
-
-    return (
-        <p className={className} style={{ lineHeight: 1.85, ...style }}>
-            {textWords.map((word, i) => (
-                <span key={i} style={{
-                    display: 'inline-block',
-                    marginRight: '0.35em',
-                    transition: `all ${word.duration}s cubic-bezier(0.25,0.46,0.45,0.94) ${word.delay}s`,
-                    opacity: isAnimating ? 1 : 0,
-                    filter: isAnimating ? 'blur(0px) brightness(1)' : `blur(${word.blur}px) brightness(0.5)`,
-                    transform: isAnimating ? 'translateY(0) scale(1) rotateX(0deg)' : `translateY(18px) scale(${word.scale}) rotateX(-15deg)`,
-                    willChange: 'filter, transform, opacity',
-                    transformStyle: 'preserve-3d',
-                    backfaceVisibility: 'hidden',
-                }}>
-                    {word.text}
-                </span>
-            ))}
-        </p>
-    );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 4. GlassButton
-// ─────────────────────────────────────────────────────────────────────────────
-function GlassButton({ children, onClick, className = '', size = 'default' }) {
-    const paddingMap = { sm: '8px 16px', default: '12px 24px', lg: '14px 32px' };
-    return (
-        <div className={`glass-btn-wrap ${className}`} style={{ display: 'inline-block', borderRadius: '9999px', position: 'relative' }}>
-            <button onClick={onClick} style={{ all: 'unset', cursor: 'pointer', display: 'block', borderRadius: '9999px' }}>
-                <span className="glass-btn-inner" style={{
-                    display: 'block',
-                    padding: paddingMap[size] || paddingMap.default,
-                    borderRadius: '9999px',
-                    fontSize: '0.88rem',
-                    fontWeight: 600,
-                    letterSpacing: '-0.01em',
-                    fontFamily: 'Outfit, sans-serif',
-                    userSelect: 'none',
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.03) 100%)',
-                    border: '1px solid rgba(255,255,255,0.22)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 20px rgba(0,0,0,0.4)',
-                    transition: 'all 0.22s ease',
-                    color: 'rgba(255,255,255,0.85)',
-                }}>
-                    {children}
-                </span>
-            </button>
-            <div style={{ position: 'absolute', left: 8, right: 8, bottom: -6, height: 14, borderRadius: '9999px', background: 'rgba(0,0,0,0.5)', filter: 'blur(10px)', zIndex: -1 }} />
-        </div>
-    );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 5. ElegantShape
-// ─────────────────────────────────────────────────────────────────────────────
-function ElegantShape({ className, delay = 0, width = 400, height = 100, rotate = 0, opacity = 0.1 }) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: -150, rotate: rotate - 15 }}
-            animate={{ opacity: 1, y: 0, rotate }}
-            transition={{ duration: 2.4, delay, ease: [0.23, 0.86, 0.39, 0.96], opacity: { duration: 1.2 } }}
-            className={`absolute ${className}`}
-        >
-            <motion.div animate={{ y: [0, 15, 0] }} transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }} style={{ width, height, position: 'relative' }}>
-                <div style={{ position: 'absolute', inset: 0, borderRadius: '9999px', background: `linear-gradient(to right, rgba(255,255,255,${opacity}), transparent)`, backdropFilter: 'blur(2px)', border: `1.5px solid rgba(255,255,255,${opacity * 1.5})`, boxShadow: `0 8px 32px 0 rgba(255,255,255,${opacity * 0.5})` }} />
-            </motion.div>
-        </motion.div>
-    );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 6. MagneticIntroIcon
-// ─────────────────────────────────────────────────────────────────────────────
-function MagneticIntroIcon({ station, i }) {
-    const ref = useRef(null);
-    const [position, setPosition] = useState({ x: 0, y: 0, r: 0, s: 1 });
-    const [isHovered, setIsHovered] = useState(false);
-
-    const handleMouseMove = (e) => {
-        if (!ref.current) return;
-        const { clientX, clientY } = e;
-        const { left, top, width, height } = ref.current.getBoundingClientRect();
-        const centerX = left + width / 2;
-        const centerY = top + height / 2;
-
-        const deltaX = clientX - centerX;
-        const deltaY = clientY - centerY;
-        const dist = Math.hypot(deltaX, deltaY);
-
-        if (dist < 80) {
-            setIsHovered(true);
-            setPosition({
-                x: deltaX * 0.5,
-                y: deltaY * 0.5,
-                r: deltaX * 0.8,
-                s: 1.25
-            });
-        } else {
-            setIsHovered(false);
-            setPosition({ x: 0, y: 0, r: 0, s: 1 });
-        }
-    };
-
-    const handleMouseLeave = () => {
-        setIsHovered(false);
-        setPosition({ x: 0, y: 0, r: 0, s: 1 });
-    };
-
-    return (
-        <motion.div
-            ref={ref}
-            whileHover={{
-                scale: 1.4,
-                rotate: [0, -15, 15, 0],
-                transition: {
-                    rotate: { repeat: Infinity, duration: 0.4 }
-                }
-            }}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            animate={{
-                x: position.x,
-                y: position.y,
-                rotate: position.r,
-                scale: position.s
-            }}
-            transition={{ type: 'spring', damping: 10, stiffness: 180 }}
-            className="flex items-center justify-center rounded-full text-sm relative cursor-pointer"
-            style={{
-                width: 32,
-                height: 32,
-                background: isHovered ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)',
-                border: `1.5px solid ${isHovered ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.15)'}`,
-                boxShadow: isHovered ? '0 0 15px rgba(255,255,255,0.3)' : 'none',
-                overflow: 'hidden',
-                zIndex: isHovered ? 20 : 1
-            }}
-        >
-            {/* Rotating Background */}
-            <motion.div
-                className="absolute inset-0"
-                animate={{ rotate: isHovered ? 360 * 2 : 360 }}
-                transition={{
-                    rotate: { duration: isHovered ? 3 : 12, repeat: Infinity, ease: "linear" }
-                }}
-                style={{
-                    background: 'conic-gradient(from 0deg, transparent, rgba(255,255,255,0.1), transparent)'
-                }}
-            />
-            <motion.div
-                className="relative z-10 flex items-center justify-center w-full h-full"
-                animate={isHovered ? { rotate: [0, -20, 20, 0] } : {}}
-                transition={{ duration: 0.5, repeat: isHovered ? Infinity : 0 }}
-            >
-                {station.isImg ? (
-                    <img src={station.icon} alt="" style={{ width: '64%', height: '64%', objectFit: 'contain', display: 'block' }} />
-                ) : (
-                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{station.icon}</span>
-                )}
-            </motion.div>
-        </motion.div>
-    );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 7. Main IntroScreen
-// ─────────────────────────────────────────────────────────────────────────────
 export function IntroScreen() {
     const phase = useGameStore((s) => s.phase);
     const startGame = useGameStore((s) => s.startGame);
-
-    const bio = "Hi, I'm S. Hiba Raliyyah, an aspiring Full Stack Developer and a pre-final year student passionate about building meaningful digital experiences. My journey began with curiosity about how websites and apps work, which grew into a strong interest in both frontend and backend development. I enjoy turning ideas into real applications and continuously improving my problem-solving skills.";
 
     return (
         <AnimatePresence>
             {phase === 'intro' && (
                 <motion.div
-                    className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden"
-                    style={{ background: 'linear-gradient(135deg, #98ee0fff 5%, #31830bff 33%, #53ce1aff 66%, #61ee0fff 100%)' }}
+                    className="fixed inset-0 z-50 overflow-hidden bg-black flex items-center justify-center select-none"
                     initial={{ opacity: 1 }}
-                    exit={{ opacity: 0, scale: 1.05 }}
-                    transition={{ duration: 0.7, ease: 'easeInOut' }}
+                    exit={{ opacity: 0, scale: 1.02 }}
+                    transition={{ duration: 0.8, ease: 'easeInOut' }}
                 >
-                    <style>{`
-                        .glass-btn-inner:hover {
-                            background: linear-gradient(135deg,rgba(255,255,255,0.2) 0%,rgba(255,255,255,0.08) 100%) !important;
-                            border-color: rgba(255,255,255,0.45) !important;
-                            transform: translateY(-3px);
-                            box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 8px 30px rgba(0,0,0,0.6) !important;
-                        }
-                        .glass-btn-inner:active { transform: scale(0.95) !important; }
-                        .btn-primary .glass-btn-inner { background: linear-gradient(135deg,rgba(255,255,255,0.18) 0%,rgba(255,255,255,0.06) 100%) !important; border-color: rgba(255,255,255,0.4) !important; color: #ffffff !important; }
-                        .btn-secondary .glass-btn-inner { background: linear-gradient(135deg,rgba(255,255,255,0.08) 0%,rgba(255,255,255,0.03) 100%) !important; border-color: rgba(255,255,255,0.2) !important; color: rgba(255,255,255,0.6) !important; }
-                    `}</style>
-
-                    {/* Corners Shadow / Vignette Effect */}
-                    <div
-                        className="absolute inset-0 pointer-events-none z-[5]"
-                        style={{ boxShadow: 'inset 0 0 150px 50px rgba(0,0,0,0.7)' }}
-                    />
-
-                    {/* Dynamic Particles Background */}
-                    <div className="absolute inset-0 pointer-events-none">
-                        <Particles
-                            particleColors={["#ffffff", "#ffffff", "#ffffff"]}
-                            particleCount={400}
-                            particleSpread={15}
-                            speed={0.1}
-                            particleBaseSize={280}
-                            moveParticlesOnHover={true}
-                            alphaParticles={true}
-                            disableRotation={false}
-                            pixelRatio={typeof window !== 'undefined' ? window.devicePixelRatio : 1}
+                    {/* ── Fixed aspect/canvas container to preserve exact Figma coordinates across screens ── */}
+                    <div className="relative w-full h-full min-w-screen min-h-screen overflow-hidden">
+                        {/* Background Hero Image */}
+                        <img
+                            src={portfolioHero}
+                            className="w-full h-full object-cover object-top absolute inset-0"
+                            alt="background hero"
                         />
-                    </div>
 
-                    {/* Background Shapes */}
-                    <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.03) 0%, transparent 60%), radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.02) 0%, transparent 60%)' }} />
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                        <ElegantShape delay={0.3} width={600} height={140} rotate={12} opacity={0.08} className="left-[-10%] top-[20%]" />
-                        <ElegantShape delay={0.5} width={500} height={120} rotate={-15} opacity={0.07} className="right-[-5%] top-[65%]" />
-                        <ElegantShape delay={0.4} width={300} height={80} rotate={-8} opacity={0.09} className="left-[5%] bottom-[8%]" />
-                    </div>
+                        {/* Subtle dark gradient overlay to ensure text contrast */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
 
-                    {/* Main Responsive Container */}
-                    <motion.div
-                        className="relative z-10 flex flex-col items-center justify-start md:justify-center min-h-screen w-full px-6 pt-8 md:pt-12 pb-12"
-                    >
-                        <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl mx-auto gap-2 md:gap-16">
-
-                            {/* LEFT PANEL */}
-                            <motion.div
-                                className="flex-1 flex flex-col justify-center items-center md:items-start text-center md:text-left md:pl-8 lg:pl-12"
-                                initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 1, ease: 'easeOut' }}
-                            >
-                                <MatrixText
-                                    text="Hiba's Journey"
-                                    initialDelay={400}
-                                    style={{
-                                        fontSize: 'clamp(1.8rem, 5.5vw, 3.2rem)',
-                                        fontWeight: 900,
-                                        fontFamily: 'Outfit, sans-serif',
-                                        letterSpacing: '-0.03em',
-                                        marginBottom: '1rem',
-                                        color: '#000000',
-                                        flexWrap: 'nowrap',
-                                    }}
-                                />
-
-                                <p
-                                    className="mb-8 text-sm md:text-base lg:text-lg opacity-90 leading-relaxed max-w-xl text-white"
-                                    style={{ fontFamily: 'Outfit, sans-serif' }}
-                                >
-                                    {bio}
-                                </p>
-
-                                <motion.div className="hidden md:flex gap-4 flex-wrap items-center justify-center md:justify-start"
-                                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 1.2, duration: 0.6 }}
-                                >
-                                    <GlassButton size="default" className="btn-secondary"
-                                        onClick={() => window.location.href = 'https://hibi-personalassistant.vercel.app/'}
-                                    >
-                                        <img src={hibiIcon} alt="Hibi" className="w-8 h-8 object-contain" />
-                                    </GlassButton>
-                                    <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}>
-                                        <GlassButton size="default" onClick={startGame} className="btn-primary">
-                                            START JOURNEY ➔
-                                        </GlassButton>
-                                    </motion.div>
-                                </motion.div>
-                            </motion.div>
-
-                            {/* RIGHT PANEL */}
-                            <motion.div
-                                className="flex-1 flex flex-col items-center justify-center"
-                                initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 1, delay: 0.2, ease: 'easeOut' }}
-                            >
-                                <div className="relative mb-10">
-                                    <motion.div
-                                        className="relative z-10 w-48 h-64 md:w-56 md:h-72 lg:w-65 lg:h-80 rounded-[2rem] overflow-hidden border-4 border-white/30 shadow-2xl bg-black/10"
-                                        style={{ willChange: 'transform' }}
-                                        whileHover={{ scale: 1.05, rotate: 2 }}
-                                        transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                                    >
-                                        <img
-                                            src={photo}
-                                            alt="Profile"
-                                            className="w-full h-full object-cover object-[center_15%] select-none"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
-                                    </motion.div>
-                                    <div className="absolute -inset-10 bg-white/10 blur-3xl rounded-full scale-75 opacity-30 -z-10" />
-                                </div>
-
-                                <motion.div
-                                    className="flex flex-col items-center mb-10 w-full"
-                                    initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.8, duration: 0.7 }}
-                                >
-                                    <ParticleTextEffect
-                                        text="S.Hiba Raliyyah"
-                                        colors={['ffffff', 'ffffff', 'ffffff', 'ffffff']}
-                                        animationForce={60}
-                                        width={typeof window !== 'undefined' && window.innerWidth < 768 ? 300 : 400}
-                                        height={typeof window !== 'undefined' && window.innerWidth < 768 ? 50 : 60}
-                                    />
-                                    <p className="mt-2 text-xs font-black uppercase tracking-[0.4em]" style={{ color: '#000000', fontFamily: 'Outfit, sans-serif', opacity: 0.9 }}>
-                                        Full Stack Developer
-                                    </p>
-                                </motion.div>
-
-                                {/* Mobile Buttons - Visible only on mobile, placed below name/title */}
-                                <motion.div className="flex md:hidden gap-4 flex-wrap items-center justify-center"
-                                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 1.2, duration: 0.6 }}
-                                >
-                                    <GlassButton size="default" className="btn-secondary"
-                                        onClick={() => window.location.href = 'https://hibi-personalassistant.vercel.app/'}
-                                    >
-                                        <img src={hibiIcon} alt="Hibi" className="w-8 h-8 object-contain" />
-                                    </GlassButton>
-                                    <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}>
-                                        <GlassButton size="default" onClick={startGame} className="btn-primary">
-                                            START JOURNEY ➔
-                                        </GlassButton>
-                                    </motion.div>
-                                </motion.div>
-                            </motion.div>
-                        </div>
-
-                        {/* Footer Hint */}
+                        {/* Hiba Raliyyah */}
                         <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: [0, 0.4, 0] }}
-                            transition={{ delay: 3, duration: 3, repeat: Infinity }}
-                            className="absolute bottom-6 md:bottom-10 text-[10px] font-black uppercase tracking-[0.3em]"
-                            style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'Outfit, sans-serif' }}
+                            initial={{ opacity: 0, x: -40 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            className="text-[#FFF] font-islandMoments text-[160px] leading-[80px] w-[400px] h-[250px] absolute left-[30px] top-[220px] text-center drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)] pointer-events-none"
+                            style={{ fontFamily: "'Island Moments', cursive" }}
                         >
-                            Loading Journey...
+                            Hiba Raliyyah
                         </motion.p>
-                    </motion.div>
+
+                        {/* AI & Full Stack Development Badge */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -60 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8, delay: 0.35 }}
+                            className="absolute left-[0px] top-[420px] z-10 flex items-center justify-center select-none"
+                            style={{
+                                width: '490px',
+                                height: '160px',
+                            }}
+                        >
+                            {/* SVG Shape from design (with bottom-left notch cutout) */}
+                            <svg
+                                viewBox="0 0 365 217"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="w-full h-full absolute inset-0 drop-shadow-[0_8px_30px_rgba(0,0,0,0.55)]"
+                                style={{ transform: 'scaleX(-1)' }}
+                            >
+                                <path
+                                    d="M0 50C0 22.3858 22.3858 0 50 0H315C342.614 0 365 22.3858 365 50V132.852V150.127C365 179.607 333.07 198.018 307.556 183.25L286.616 171.13C270.402 161.745 250.111 173.445 250.111 192.179C250.111 205.611 239.249 216.5 225.817 216.5C202.5 216.5 164.743 216.5 123 216.5C95.4402 216.5 70.2735 216.5 49.9848 216.5C22.3706 216.5 0 194.114 0 166.5V108.25V50Z"
+                                    fill="#118D05"
+                                    fillOpacity="0.65"
+                                />
+                            </svg>
+
+                            {/* Centered Text */}
+                            <span
+                                className="relative z-10 text-[#FFF] font-pressStart2P tracking-wider text-center px-8"
+                                style={{
+                                    fontFamily: "'Press Start 2P', cursive",
+                                    fontSize: '18px',
+                                    lineHeight: '1.65',
+                                    textAlign: 'center',
+                                    transform: 'translateY(-22px)',
+                                    textShadow: '0 2px 8px rgba(0, 0, 0, 0.7)',
+                                }}
+                            >
+                                AI &amp; <br /> Full Stack
+                                <br />
+                                Development
+                            </span>
+                        </motion.div>
+
+                        {/* CSE & Final Year Badge Container */}
+                        <motion.div
+                            initial={{ opacity: 0, x: 40 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8, delay: 0.4 }}
+                            className="absolute left-[1000px] top-[280px] z-10 select-none flex flex-col items-center justify-center"
+                            style={{ width: '255px', height: '150px' }}
+                        >
+                            {/* Custom Green Badge SVG */}
+                            <svg
+                                width="255"
+                                height="150"
+                                viewBox="0 0 365 217"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="w-full h-full absolute inset-0 drop-shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
+                            >
+                                <path
+                                    d="M0 50C0 22.3858 22.3858 0 50 0H315C342.614 0 365 22.3858 365 50V132.852V150.127C365 179.607 333.07 198.018 307.556 183.25L286.616 171.13C270.402 161.745 250.111 173.445 250.111 192.179C250.111 205.611 239.249 216.5 225.817 216.5C202.5 216.5 164.743 216.5 123 216.5C95.4402 216.5 70.2735 216.5 49.9848 216.5C22.3706 216.5 0 194.114 0 166.5V108.25V50Z"
+                                    fill="#118D05"
+                                    fillOpacity="0.65"
+                                />
+                            </svg>
+
+                            {/* CSE Text */}
+                            <p
+                                className="relative z-10 text-[#17430B] font-luxuriousRoman text-[56px] leading-[56px] text-center font-bold"
+                                style={{ fontFamily: "'Luxurious Roman', serif" }}
+                            >
+                                CSE
+                            </p>
+
+                            {/* Final Year Text */}
+                            <p
+                                className="relative z-10 text-[#FFF] font-poppins text-[45px] leading-[50px] text-center font-semibold drop-shadow-md"
+                                style={{ fontFamily: "'Poppins', sans-serif" }}
+                            >
+                                Final Year
+                            </p>
+                        </motion.div>
+
+                        {/* Start Journey Button Container & Trigger */}
+                        <motion.button
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ 
+                                opacity: 1, 
+                                scale: [1, 1.03, 1],
+                                boxShadow: [
+                                    '0 0 20px rgba(32,166,25,0.6)',
+                                    '0 0 40px rgba(32,166,25,0.9)',
+                                    '0 0 20px rgba(32,166,25,0.6)'
+                                ]
+                            }}
+                            transition={{ 
+                                opacity: { duration: 0.6, delay: 0.9 },
+                                scale: { repeat: Infinity, duration: 1.5, ease: "easeInOut" },
+                                boxShadow: { repeat: Infinity, duration: 1.5, ease: "easeInOut" }
+                            }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.96 }}
+                            onClick={startGame}
+                            className="absolute left-[1020px] top-[480px] w-[220px] h-[50px] rounded-[25px] bg-[#20A619] cursor-pointer flex items-center justify-center border border-white/30 shadow-[0_0_20px_rgba(32,166,25,0.6)] hover:shadow-[0_0_35px_rgba(32,166,25,0.9)] transition-all z-20 group"
+                        >
+                            <span
+                                className="text-[#FFF] font-pressStart2P text-sm leading-none text-center flex items-center justify-center gap-1"
+                                style={{ fontFamily: "'Press Start 2P', cursive" }}
+                            >
+                                START JOURNEY
+                                <svg className="w-4 h-4 font-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M5 12h14M12 5l7 7-7 7" />
+                                </svg>
+                            </span>
+                        </motion.button>
+
+                        {/* Social Buttons Container — Bottom Center */}
+                        <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center gap-[107px] z-20 pl-[120px]">
+                            {/* 1. LinkedIn */}
+                            <motion.a
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 1.0 }}
+                                whileHover={{ scale: 1.15, y: -4 }}
+                                whileTap={{ scale: 0.95 }}
+                                href="https://www.linkedin.com/in/hiba-raliyyah-samsudeen-10032006hr/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-[70px] h-[70px] flex items-center justify-center rounded-full bg-white/25 hover:bg-white/30 border border-white/25 backdrop-blur-md transition-colors cursor-pointer group shadow-lg"
+                            >
+                            <svg className="w-[35px] h-[35px] text-white fill-current group-hover:text-white transition-colors" viewBox="0 0 24 24">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                            </svg>
+                        </motion.a>
+
+                        {/* 2. GitHub */}
+                        <motion.a
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 1.1 }}
+                            whileHover={{ scale: 1.15, y: -4 }}
+                            whileTap={{ scale: 0.95 }}
+                            href="https://github.com/HibaRaliyyah"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                                className="w-[70px] h-[70px] flex items-center justify-center rounded-full bg-white/25 hover:bg-white/30 border border-white/25 backdrop-blur-md transition-colors cursor-pointer group shadow-lg"
+                            >
+                            <svg
+                                width="35"
+                                height="34"
+                                viewBox="0 0 50 49"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="w-[35px] h-[35px] text-white group-hover:text-white transition-colors"
+                            >
+                                <path
+                                    fillRule="evenodd"
+                                    clipRule="evenodd"
+                                    d="M25 0C11.1875 0 0 11.1875 0 25C0 36.0625 7.15625 45.4062 17.0937 48.7187C18.3437 48.9375 18.8125 48.1875 18.8125 47.5312C18.8125 46.9375 18.7812 44.9687 18.7812 42.875C12.5 44.0312 10.875 41.3437 10.375 39.9375C10.0937 39.2187 8.875 37 7.8125 36.4062C6.9375 35.9375 5.6875 34.7812 7.78125 34.75C9.75 34.7187 11.1562 36.5625 11.625 37.3125C13.875 41.0937 17.4687 40.0312 18.9062 39.375C19.125 37.75 19.7812 36.6562 20.5 36.0312C14.9375 35.4062 9.125 33.25 9.125 23.6875C9.125 20.9687 10.0937 18.7188 11.6875 16.9688C11.4375 16.3438 10.5625 13.7812 11.9375 10.3437C11.9375 10.3437 14.0312 9.6875 18.8125 12.9062C20.8125 12.3437 22.9375 12.0625 25.0625 12.0625C27.1875 12.0625 29.3125 12.3437 31.3125 12.9062C36.0937 9.65625 38.1875 10.3437 38.1875 10.3437C39.5625 13.7812 38.6875 16.3438 38.4375 16.9688C40.0313 18.7188 41 20.9375 41 23.6875C41 33.2812 35.1562 35.4062 29.5937 36.0312C30.5 36.8125 31.2812 38.3125 31.2812 40.6562C31.2812 44 31.25 46.6875 31.25 47.5312C31.25 48.1875 31.7187 48.9687 32.9687 48.7187C37.9316 47.0432 42.2441 43.8535 45.2993 39.5987C48.3545 35.3439 49.9985 30.2381 50 25C50 11.1875 38.8125 0 25 0Z"
+                                    fill="currentColor"
+                                />
+                            </svg>
+                        </motion.a>
+
+                        {/* 3. Hibi Assistant */}
+                        <motion.a
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 1.2 }}
+                            whileHover={{ scale: 1.15, y: -4 }}
+                            whileTap={{ scale: 0.95 }}
+                            href="https://hibi-personalassistant.vercel.app/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                                className="w-[70px] h-[70px] flex items-center justify-center rounded-full bg-white/25 hover:bg-white/30 border border-white/25 backdrop-blur-md transition-colors cursor-pointer group shadow-lg"
+                            >
+                            <img
+                                src={hibiIcon}
+                                className="w-[38px] h-[38px] object-contain max-w-none grayscale"
+                                alt="Hibi assistant"
+                            />
+                        </motion.a>
+                        </div>
+                    </div>
                 </motion.div>
             )}
         </AnimatePresence>
     );
 }
+
+export default IntroScreen;

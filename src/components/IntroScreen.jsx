@@ -11,17 +11,18 @@ const DESIGN_H = 900;
 export function IntroScreen() {
     const phase = useGameStore((s) => s.phase);
     const startGame = useGameStore((s) => s.startGame);
-    const stageRef = useRef(null);
+    const scaleRef = useRef(null);
 
     useEffect(() => {
-        const el = stageRef.current;
+        const el = scaleRef.current;
         if (!el) return;
         const apply = () => {
             const vw = window.innerWidth;
             const vh = window.innerHeight;
             const scale = Math.min(vw / DESIGN_W, vh / DESIGN_H);
-            el.style.transform = `scale(${scale})`;
-            el.style.transformOrigin = 'center center';
+            const clamped = Math.min(scale, 1);
+            const factor = vw <= 768 ? 0.78 : vw <= 1024 ? 0.88 : 1;
+            el.style.transform = `translate(-50%, -50%) scale(${clamped * factor})`;
         };
         apply();
         window.addEventListener('resize', apply);
@@ -32,40 +33,46 @@ export function IntroScreen() {
         <AnimatePresence>
             {phase === 'intro' && (
                 <motion.div
-                    className="fixed inset-0 z-50 overflow-hidden bg-black flex items-center justify-center select-none"
+                    className="fixed inset-0 z-50 overflow-hidden bg-black select-none"
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0, scale: 1.02 }}
                     transition={{ duration: 0.8, ease: 'easeInOut' }}
                 >
-                    {/* ── Responsive stage ──
-                         All absolute pixel offsets below match the 1440×900 Figma
-                         design. We scale the whole stage to fit any viewport while
-                         preserving exact internal coordinates. */}
-                    <div
-                        ref={stageRef}
-                        className="relative shrink-0 overflow-hidden select-none"
-                        style={{
-                            width: `${DESIGN_W}px`,
-                            height: `${DESIGN_H}px`,
-                            transformOrigin: 'center center',
-                        }}
-                    >
-                        {/* Background Hero Image */}
-                        <img
-                            src={portfolioHero}
-                            className="w-full h-full object-cover object-top absolute inset-0"
-                            alt="background hero"
-                        />
+                    {/* Background fills the ENTIRE viewport at all sizes */}
+                    <img
+                        src={portfolioHero}
+                        className="w-full h-full object-cover object-top absolute inset-0"
+                        alt="background hero"
+                    />
 
-                        {/* Subtle dark gradient overlay to ensure text contrast */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+                    {/* Subtle dark gradient overlay to ensure text contrast */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+
+                    {/* Content layer — scales the 1440×900 design to fit while
+                         keeping it full-bleed on matching-aspect screens. The
+                         background image behind always covers the viewport, so the
+                         intro never appears small with empty margins. */}
+                        <div
+                            ref={scaleRef}
+                            className="absolute inset-0 pointer-events-none intro-scale-wrapper"
+                        >
+                        <div
+                            className="relative"
+                            style={{
+                                width: `${DESIGN_W}px`,
+                                height: `${DESIGN_H}px`,
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                            }}
+                        >
 
                         {/* Hiba Raliyyah */}
                         <motion.p
                             initial={{ opacity: 0, x: -40 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.8, delay: 0.2 }}
-                            className="text-[#FFF] font-islandMoments text-[160px] leading-[80px] w-[400px] h-[250px] absolute left-[30px] top-[220px] text-center drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)] pointer-events-none"
+                            className="text-[#FFF] font-islandMoments text-[230px] leading-[120px] w-[360px] h-[210px] absolute left-[120px] top-[360px] text-center drop-shadow-[0_4px_24px_rgba(0,0,0,0.85)] pointer-events-none"
                             style={{ fontFamily: "'Island Moments', cursive" }}
                         >
                             Hiba Raliyyah
@@ -76,10 +83,10 @@ export function IntroScreen() {
                             initial={{ opacity: 0, x: -60 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.8, delay: 0.35 }}
-                            className="absolute left-[0px] top-[420px] z-10 flex items-center justify-center select-none"
+                            className="absolute left-[60px] top-[670px] z-10 flex items-center justify-center select-none"
                             style={{
-                                width: '490px',
-                                height: '160px',
+                                width: '670px',
+                                height: '200px',
                             }}
                         >
                             {/* SVG Shape from design (with bottom-left notch cutout) */}
@@ -102,7 +109,7 @@ export function IntroScreen() {
                                 className="relative z-10 text-[#FFF] font-pressStart2P tracking-wider text-center px-8"
                                 style={{
                                     fontFamily: "'Press Start 2P', cursive",
-                                    fontSize: '18px',
+                                    fontSize: '22px',
                                     lineHeight: '1.65',
                                     textAlign: 'center',
                                     transform: 'translateY(-22px)',
@@ -120,8 +127,8 @@ export function IntroScreen() {
                             initial={{ opacity: 0, x: 40 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.8, delay: 0.4 }}
-                            className="absolute left-[1000px] top-[280px] z-10 select-none flex flex-col items-center justify-center"
-                            style={{ width: '255px', height: '150px' }}
+                            className="absolute left-[1060px] top-[400px] z-10 select-none flex flex-col items-center justify-center"
+                            style={{ width: '1080px', height: '230px' }}
                         >
                             {/* Custom Green Badge SVG */}
                             <svg
@@ -141,7 +148,7 @@ export function IntroScreen() {
 
                             {/* CSE Text */}
                             <p
-                                className="relative z-10 text-[#17430B] font-luxuriousRoman text-[56px] leading-[56px] text-center font-bold"
+                                className="relative z-10 text-[#17430B] font-luxuriousRoman text-[80px] leading-[86px] text-center font-bold translate-y-[-38px]"
                                 style={{ fontFamily: "'Luxurious Roman', serif" }}
                             >
                                 CSE
@@ -149,7 +156,7 @@ export function IntroScreen() {
 
                             {/* Final Year Text */}
                             <p
-                                className="relative z-10 text-[#FFF] font-poppins text-[45px] leading-[50px] text-center font-semibold drop-shadow-md"
+                                className="relative z-10 text-[#FFF] font-poppins text-[70px] leading-[50px] text-center font-semibold drop-shadow-md translate-y-[-28px]"
                                 style={{ fontFamily: "'Poppins', sans-serif" }}
                             >
                                 Final Year
@@ -176,10 +183,10 @@ export function IntroScreen() {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.96 }}
                             onClick={startGame}
-                            className="absolute left-[1020px] top-[480px] w-[220px] h-[50px] rounded-[25px] bg-[#20A619] cursor-pointer flex items-center justify-center border border-white/30 shadow-[0_0_20px_rgba(32,166,25,0.6)] hover:shadow-[0_0_35px_rgba(32,166,25,0.9)] transition-all z-20 group"
+                            className="absolute left-[1500px] top-[690px] w-[320px] h-[80px] rounded-[50px] bg-[#20A619] cursor-pointer flex items-center justify-center border border-white/30 shadow-[0_0_20px_rgba(32,166,25,0.6)] hover:shadow-[0_0_35px_rgba(32,166,25,0.9)] transition-all z-20 group"
                         >
                             <span
-                                className="text-[#FFF] font-pressStart2P text-sm leading-none text-center flex items-center justify-center gap-1"
+                                className="text-[#FFF] font-pressStart2P text-md leading-none text-center flex items-center justify-center gap-1"
                                 style={{ fontFamily: "'Press Start 2P', cursive" }}
                             >
                                 START JOURNEY
@@ -190,7 +197,7 @@ export function IntroScreen() {
                         </motion.button>
 
                         {/* Social Buttons Container — Bottom Center */}
-                        <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center gap-[107px] z-20 pl-[120px]">
+                        <div className="absolute bottom-8 right-24 flex items-center gap-[107px] z-20">
                             {/* 1. LinkedIn */}
                             <motion.a
                                 initial={{ opacity: 0, y: 20 }}
@@ -201,9 +208,9 @@ export function IntroScreen() {
                                 href="https://www.linkedin.com/in/hiba-raliyyah-samsudeen-10032006hr/"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-[70px] h-[70px] flex items-center justify-center rounded-full bg-white/25 hover:bg-white/30 border border-white/25 backdrop-blur-md transition-colors cursor-pointer group shadow-lg"
+                                className="w-[88px] h-[88px] flex items-center justify-center rounded-full bg-white/25 hover:bg-white/30 border border-white/25 backdrop-blur-md transition-colors cursor-pointer group shadow-lg"
                             >
-                            <svg className="w-[35px] h-[35px] text-white fill-current group-hover:text-white transition-colors" viewBox="0 0 24 24">
+                            <svg className="w-[44px] h-[44px] text-white fill-current group-hover:text-white transition-colors" viewBox="0 0 24 24">
                                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                             </svg>
                         </motion.a>
@@ -218,7 +225,7 @@ export function IntroScreen() {
                             href="https://github.com/HibaRaliyyah"
                             target="_blank"
                             rel="noopener noreferrer"
-                                className="w-[70px] h-[70px] flex items-center justify-center rounded-full bg-white/25 hover:bg-white/30 border border-white/25 backdrop-blur-md transition-colors cursor-pointer group shadow-lg"
+                                className="w-[88px] h-[88px] flex items-center justify-center rounded-full bg-white/25 hover:bg-white/30 border border-white/25 backdrop-blur-md transition-colors cursor-pointer group shadow-lg"
                             >
                             <svg
                                 width="35"
@@ -226,7 +233,7 @@ export function IntroScreen() {
                                 viewBox="0 0 50 49"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="w-[35px] h-[35px] text-white group-hover:text-white transition-colors"
+                                className="w-[44px] h-[44px] text-white group-hover:text-white transition-colors"
                             >
                                 <path
                                     fillRule="evenodd"
@@ -247,16 +254,17 @@ export function IntroScreen() {
                             href="https://hibi-personalassistant.vercel.app/"
                             target="_blank"
                             rel="noopener noreferrer"
-                                className="w-[70px] h-[70px] flex items-center justify-center rounded-full bg-white/25 hover:bg-white/30 border border-white/25 backdrop-blur-md transition-colors cursor-pointer group shadow-lg"
+                                className="w-[88px] h-[88px] flex items-center justify-center rounded-full bg-white/25 hover:bg-white/30 border border-white/25 backdrop-blur-md transition-colors cursor-pointer group shadow-lg"
                             >
                             <img
                                 src={hibiIcon}
-                                className="w-[38px] h-[38px] object-contain max-w-none grayscale"
+                                className="w-[48px] h-[48px] object-contain max-w-none grayscale"
                                 alt="Hibi assistant"
                             />
                         </motion.a>
-                        </div>
                     </div>
+                </div>
+                </div>
                 </motion.div>
             )}
         </AnimatePresence>

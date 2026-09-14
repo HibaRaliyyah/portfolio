@@ -18,7 +18,7 @@ export default function App() {
 
   return (
     <OrientationGate>
-      <div className="grain" style={{ width: '100vw', height: '100dvh', position: 'relative', overflow: 'hidden' }}>
+      <div className="grain" style={{ width: '100%', height: '100dvh', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', inset: 0 }}>
           <Suspense fallback={null}>
             <World />

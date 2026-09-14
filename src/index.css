@@ -27,7 +27,9 @@ body,
 #root {
     width: 100%;
     height: 100%;
+    max-width: 100vw;
     overflow: hidden;
+    overflow-x: hidden;
     background: var(--color-dark);
     font-family: 'Outfit', sans-serif;
     color: white;
@@ -44,6 +46,8 @@ select-none {
 html.orientation-locked,
 body.orientation-locked {
     overflow: hidden;
+    overflow-x: hidden;
+    max-width: 100vw;
     height: 100%;
     width: 100%;
     touch-action: none;
@@ -61,6 +65,52 @@ body.orientation-locked {
         transform: scale(0.75);
         transform-origin: center;
     }
+}
+
+/* Intro screen: reduce scale further on mobile and tablet */
+@media (max-width: 768px) {
+    .intro-scale-wrapper {
+        transform: translate(-50%, -50%) scale(min(calc(100vw / 1440), calc(100vh / 900)) * 0.78) !important;
+    }
+}
+
+/* Tablet view: slightly reduce scale */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .intro-scale-wrapper {
+        transform: translate(-50%, -50%) scale(min(calc(100vw / 1440), calc(100vh / 900)) * 0.88) !important;
+    }
+}
+
+/* Mobile: reduce overall sizes for better fit */
+@media (max-width: 768px) {
+    html, body, #root {
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+    .grain,
+    .grain * {
+        max-width: 100vw;
+    }
+    canvas {
+        max-width: 100vw;
+    }
+    [class*="fixed"] {
+        max-width: 100vw;
+    }
+    .text-xl { font-size: 1.1rem !important; }
+    .text-2xl { font-size: 1.25rem !important; }
+    .text-3xl { font-size: 1.4rem !important; }
+    h1 { font-size: 1.8rem !important; }
+    h2 { font-size: 1.5rem !important; }
+    h3 { font-size: 1.2rem !important; }
+}
+
+/* Tablet: moderate size reduction */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .text-xl { font-size: 1.3rem !important; }
+    .text-2xl { font-size: 1.5rem !important; }
+    h1 { font-size: 2rem !important; }
+    h2 { font-size: 1.7rem !important; }
 }
 
 /* Mobile: allow vertical tap to drive, keep hint readable */

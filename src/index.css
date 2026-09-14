@@ -25,12 +25,43 @@
 html,
 body,
 #root {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: var(--color-dark);
-  font-family: 'Outfit', sans-serif;
-  color: white;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--color-dark);
+    font-family: 'Outfit', sans-serif;
+    color: white;
+    touch-action: none;
+}
+
+/* Prevent text selection on the game canvas / HUD */
+select-none {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Responsive HUD station dots — scale down on small screens */
+@media (max-width: 480px) {
+    .hud-station-dots {
+        gap: 1px !important;
+        padding-top: 2px !important;
+        padding-bottom: 2px !important;
+    }
+    .hud-station-dots > div {
+        transform: scale(0.75);
+        transform-origin: center;
+    }
+}
+
+/* Mobile: allow vertical tap to drive, keep hint readable */
+@media (max-width: 768px) {
+    .drive-hint {
+        bottom: 6px !important;
+    }
+    .drive-hint > div {
+        font-size: 9px !important;
+        padding: 6px 10px !important;
+    }
 }
 
 canvas {

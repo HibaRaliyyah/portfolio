@@ -171,13 +171,13 @@ function TechCloud({ technologies }) {
     const handleMouseLeave = () => { mousePos.current = { x: -1000, y: -1000 }; };
 
     return (
-        <div
-            ref={containerRef}
-            className="relative w-full overflow-hidden rounded-[30px] md:rounded-[40px] border border-white/10 bg-gradient-to-br from-[#1a1a1a] via-[#0a0a0a] to-black shadow-[inset_0_8px_32px_rgba(0,0,0,0.5),0_20px_40px_rgba(0,0,0,0.2)] h-[440px] md:h-[360px]"
-            style={{ marginTop: 20 }}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-        >
+<div
+                            ref={containerRef}
+                            className="relative w-full overflow-hidden rounded-[30px] md:rounded-[40px] border border-white/10 bg-gradient-to-br from-[#1a1a1a] via-[#0a0a0a] to-black shadow-[inset_0_8px_32px_rgba(0,0,0,0.5),0_20px_40px_rgba(0,0,0,0.2)] h-[320px] sm:h-[380px] md:h-[360px]"
+                            style={{ marginTop: 20 }}
+                            onMouseMove={handleMouseMove}
+                            onMouseLeave={handleMouseLeave}
+                        >
             {bubbles.map((b) => (
                 <div
                     key={b.id}
@@ -323,11 +323,11 @@ function CertificateFolders() {
     const [activeFolderIdx, setActiveFolderIdx] = useState(null);
 
     return (
-        <div className="py-8 flex flex-col gap-10 md:gap-20 items-center justify-center w-full">
+        <div className="py-6 sm:py-8 flex flex-col gap-8 sm:gap-12 md:gap-16 items-center justify-center w-full">
             {/* Folders Container */}
-            <div className="flex flex-wrap gap-10 md:gap-20 justify-center items-end w-full">
+            <div className="flex flex-wrap gap-6 sm:gap-8 md:gap-12 justify-center items-end w-full">
                 {groups.map((group, i) => (
-                    <div key={i} className="flex flex-col items-center gap-4 scale-90 md:scale-100">
+                    <div key={i} className="flex flex-col items-center gap-3 sm:gap-4 scale-75 sm:scale-85 md:scale-100">
                         <Folder
                             color={group.color}
                             size={1.5}
@@ -555,7 +555,7 @@ export function NewspaperModal() {
                                                             ))}
                                                         </div>
                                                     )}
-                                                    <div className="relative w-full h-[500px] mt-8 rounded-[40px] overflow-hidden border-[5px] border-[#3d2a1d20] shadow-inner bg-[#3d2a1d05]">
+                                                    <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] mt-8 rounded-[40px] overflow-hidden border-[5px] border-[#3d2a1d20] shadow-inner bg-[#3d2a1d05]">
                                                         <DomeGallery
                                                             images={(station.projects || []).map(p => ({ src: p.src, alt: p.alt }))}
                                                             fit={1}

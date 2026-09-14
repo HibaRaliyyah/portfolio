@@ -15,8 +15,8 @@ export default function App() {
   const selectedProject = useGameStore((s) => s.selectedProject);
   const clearSelectedProject = useGameStore((s) => s.clearSelectedProject);
 
-  return (
-    <div className="grain" style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
+return (
+        <div className="grain" style={{ width: '100vw', height: '100dvh', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', inset: 0 }}>
         <Suspense fallback={null}>
           <World />

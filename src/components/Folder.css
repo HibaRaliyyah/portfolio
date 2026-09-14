@@ -74,6 +74,54 @@
     border-radius: 0px 10px 10px 10px;
 }
 
+/* On small screens, scale the folder down so 5 folders still fit */
+@media (max-width: 640px) {
+    .folder__back {
+        width: 72px;
+        height: 58px;
+    }
+    .folder__back::after {
+        width: 22px;
+        height: 8px;
+        bottom: 97%;
+    }
+    .paper {
+        bottom: 8%;
+        width: 62%;
+        height: 78%;
+    }
+    .paper:nth-child(2) {
+        width: 72%;
+        height: 66%;
+    }
+    .paper:nth-child(3) {
+        width: 82%;
+        height: 54%;
+    }
+    .folder__front {
+        border-radius: 5px 8px 8px 8px;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    .folder__back {
+        width: 86px;
+        height: 69px;
+    }
+    .paper {
+        width: 68%;
+        height: 79%;
+    }
+    .paper:nth-child(2) {
+        width: 78%;
+        height: 70%;
+    }
+    .paper:nth-child(3) {
+        width: 88%;
+        height: 60%;
+    }
+}
+
 .folder__back::after {
     position: absolute;
     z-index: 0;

@@ -1,12 +1,32 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../store/gameStore';
 import portfolioHero from '../assets/background.png';
 import hibiIcon from '../assets/hibi.png';
 
+// Figma design dimensions — all absolute pixel offsets below are relative to this.
+const DESIGN_W = 1440;
+const DESIGN_H = 900;
+
 export function IntroScreen() {
     const phase = useGameStore((s) => s.phase);
     const startGame = useGameStore((s) => s.startGame);
+    const stageRef = useRef(null);
+
+    useEffect(() => {
+        const el = stageRef.current;
+        if (!el) return;
+        const apply = () => {
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            const scale = Math.min(vw / DESIGN_W, vh / DESIGN_H);
+            el.style.transform = `scale(${scale})`;
+            el.style.transformOrigin = 'center center';
+        };
+        apply();
+        window.addEventListener('resize', apply);
+        return () => window.removeEventListener('resize', apply);
+    }, []);
 
     return (
         <AnimatePresence>
@@ -17,8 +37,19 @@ export function IntroScreen() {
                     exit={{ opacity: 0, scale: 1.02 }}
                     transition={{ duration: 0.8, ease: 'easeInOut' }}
                 >
-                    {/* ── Fixed aspect/canvas container to preserve exact Figma coordinates across screens ── */}
-                    <div className="relative w-full h-full min-w-screen min-h-screen overflow-hidden">
+                    {/* ── Responsive stage ──
+                         All absolute pixel offsets below match the 1440×900 Figma
+                         design. We scale the whole stage to fit any viewport while
+                         preserving exact internal coordinates. */}
+                    <div
+                        ref={stageRef}
+                        className="relative shrink-0 overflow-hidden select-none"
+                        style={{
+                            width: `${DESIGN_W}px`,
+                            height: `${DESIGN_H}px`,
+                            transformOrigin: 'center center',
+                        }}
+                    >
                         {/* Background Hero Image */}
                         <img
                             src={portfolioHero}

@@ -82,66 +82,66 @@ const MagneticBall = ({ social, index }) => {
                 }}
                 className="flex items-center justify-center p-2"
             >
-                <motion.a
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-16 h-16 rounded-full flex items-center justify-center shadow-2xl relative group overflow-hidden"
+<motion.a
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-2xl relative group overflow-hidden"
+                style={{
+                    rotateZ: rotate,
+                    rotateX,
+                    rotateY,
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    backdropFilter: 'blur(16px)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    boxShadow: isHovered ? '0 10px 30px rgba(255,255,255,0.2)' : '0 4px 12px rgba(0,0,0,0.3)',
+                }}
+                animate={{
+                    scale: isHovered ? 1.25 : 1,
+                }}
+                transition={{ type: 'spring', damping: 10, stiffness: 180 }}
+                whileHover={{
+                    scale: 1.3,
+                    rotate: [0, -20, 20, 0],
+                    transition: {
+                        rotate: { repeat: Infinity, duration: 0.4 }
+                    }
+                }}
+                whileTap={{ scale: 0.85 }}
+            >
+                {/* Rotating background layer - speeds up on hover */}
+                <motion.div
+                    className="absolute inset-0 rounded-full"
+                    animate={{ rotate: isHovered ? 360 * 2 : 360 }}
+                    transition={{
+                        rotate: { duration: isHovered ? 3 : 10, repeat: Infinity, ease: "linear" }
+                    }}
                     style={{
-                        rotateZ: rotate,
-                        rotateX,
-                        rotateY,
-                        background: 'rgba(255, 255, 255, 0.08)',
-                        backdropFilter: 'blur(16px)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        boxShadow: isHovered ? '0 10px 30px rgba(255,255,255,0.2)' : '0 4px 12px rgba(0,0,0,0.3)',
+                        backgroundImage: 'radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0.1) 100%)',
                     }}
-                    animate={{
-                        scale: isHovered ? 1.25 : 1,
-                    }}
-                    transition={{ type: 'spring', damping: 10, stiffness: 180 }}
-                    whileHover={{
-                        scale: 1.3,
-                        rotate: [0, -20, 20, 0],
-                        transition: {
-                            rotate: { repeat: Infinity, duration: 0.4 }
-                        }
-                    }}
-                    whileTap={{ scale: 0.85 }}
-                >
-                    {/* Rotating background layer - speeds up on hover */}
-                    <motion.div
-                        className="absolute inset-0 rounded-full"
-                        animate={{ rotate: isHovered ? 360 * 2 : 360 }}
-                        transition={{
-                            rotate: { duration: isHovered ? 3 : 10, repeat: Infinity, ease: "linear" }
-                        }}
-                        style={{
-                            backgroundImage: 'radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0.1) 100%)',
-                        }}
-                    />
+                />
 
-                    {/* 3D-like ball highlights */}
-                    <div className="absolute top-1 left-1 w-1/2 h-1/2 bg-white/25 rounded-full blur-[3px] pointer-events-none" />
-                    <div className="absolute bottom-1 right-1 w-1/4 h-1/4 bg-black/30 rounded-full blur-[4px] pointer-events-none" />
+                {/* 3D-like ball highlights */}
+                <div className="absolute top-1 left-1 w-1/2 h-1/2 bg-white/25 rounded-full blur-[3px] pointer-events-none" />
+                <div className="absolute bottom-1 right-1 w-1/4 h-1/4 bg-black/30 rounded-full blur-[4px] pointer-events-none" />
 
-                    <motion.img
-                        src={social.icon}
-                        alt={social.id}
-                        className="w-9 h-9 object-contain relative z-10"
-                        animate={isHovered ? {
-                            rotate: [0, -15, 15, 0],
-                            scale: [(social.iconScale || 1), (social.iconScale || 1) * 1.1, (social.iconScale || 1)]
-                        } : {}}
-                        transition={{ duration: 0.6, repeat: isHovered ? Infinity : 0 }}
-                    />
+                <motion.img
+                    src={social.icon}
+                    alt={social.id}
+                    className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 object-contain relative z-10"
+                    animate={isHovered ? {
+                        rotate: [0, -15, 15, 0],
+                        scale: [(social.iconScale || 1), (social.iconScale || 1) * 1.1, (social.iconScale || 1)]
+                    } : {}}
+                    transition={{ duration: 0.6, repeat: isHovered ? Infinity : 0 }}
+                />
 
-                    {/* Shimmer effect on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" style={{ skewX: '-20deg' }} />
+                {/* Shimmer effect on hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:animate-shimmer pointer-events-none" style={{ skewX: '-20deg' }} />
 
-                    {/* Glow ring */}
-                    <div className="absolute inset-0 rounded-full border border-white/0 group-hover:border-white/30 transition-colors pointer-events-none" />
-                </motion.a>
+                {/* Glow ring */}
+                <div className="absolute inset-0 rounded-full border border-white/0 group-hover:border-white/30 transition-colors pointer-events-none" />
+            </motion.a>
             </motion.div>
         </div>
     );
@@ -164,8 +164,8 @@ export function SocialLinks({ isFloating = true, className = "" }) {
     }
 
     const containerStyle = isFloating
-        ? "fixed bottom-6 right-6 z-[70] flex flex-col gap-4"
-        : `flex gap-4 ${className}`;
+        ? "fixed bottom-6 right-6 z-[70] flex flex-col gap-3 md:gap-4"
+        : `flex flex-wrap md:flex-row gap-3 md:gap-4 ${className}`;
 
     return (
         <div className={containerStyle}>

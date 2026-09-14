@@ -96,7 +96,7 @@ export function HUD() {
         <>
             {/* Station dots */}
             <motion.div
-                className="fixed top-0 left-0 right-0 z-[100] flex flex-wrap justify-center pt-4 pb-3 gap-2 md:gap-3"
+                className="fixed top-0 left-0 right-0 z-[100] flex flex-wrap justify-center pt-4 pb-3 gap-2 md:gap-3 hud-station-dots"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}

@@ -40,6 +40,16 @@ select-none {
     -webkit-user-select: none;
 }
 
+/* Lock the page when the portrait orientation gate is shown */
+html.orientation-locked,
+body.orientation-locked {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    touch-action: none;
+    overscroll-behavior: none;
+}
+
 /* Responsive HUD station dots — scale down on small screens */
 @media (max-width: 480px) {
     .hud-station-dots {

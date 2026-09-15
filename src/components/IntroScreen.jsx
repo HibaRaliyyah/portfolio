@@ -202,6 +202,7 @@ export function IntroScreen() {
                             <motion.button
                                 type="button"
                                 aria-label="Start the journey"
+                                style={{ pointerEvents: 'auto' }}
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{
                                     opacity: 1,
@@ -249,7 +250,7 @@ export function IntroScreen() {
 
                             {/* ─── Social Buttons — Bottom Center (hidden on mobile) ─── */}
                             {!isMobile && (
-                                <div className="absolute bottom-8 right-24 flex items-center gap-[107px] z-20">
+                                <div className="absolute bottom-8 right-24 flex items-center gap-[107px] z-20" style={{ pointerEvents: 'auto' }}>
                                     {/* 1. LinkedIn */}
                                     <motion.a
                                         aria-label="LinkedIn"

@@ -67,20 +67,6 @@ body.orientation-locked {
     }
 }
 
-/* Intro screen: reduce scale further on mobile and tablet */
-@media (max-width: 768px) {
-    .intro-scale-wrapper {
-        transform: translate(-50%, -50%) scale(min(calc(100vw / 1440), calc(100vh / 900)) * 0.78) !important;
-    }
-}
-
-/* Tablet view: slightly reduce scale */
-@media (min-width: 769px) and (max-width: 1024px) {
-    .intro-scale-wrapper {
-        transform: translate(-50%, -50%) scale(min(calc(100vw / 1440), calc(100vh / 900)) * 0.88) !important;
-    }
-}
-
 /* Mobile: reduce overall sizes for better fit */
 @media (max-width: 768px) {
     html, body, #root {

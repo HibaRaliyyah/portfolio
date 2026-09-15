@@ -21,7 +21,7 @@ export function IntroScreen() {
             const vh = window.innerHeight;
             const scale = Math.min(vw / DESIGN_W, vh / DESIGN_H);
             const clamped = Math.min(scale, 1);
-            const factor = vw <= 768 ? 0.78 : vw <= 1024 ? 0.88 : 1;
+            const factor = vw <= 768 ? 0.92 : vw <= 1024 ? 0.65 : 1;
             el.style.transform = `translate(-50%, -50%) scale(${clamped * factor})`;
         };
         apply();
